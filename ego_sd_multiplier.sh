@@ -5,7 +5,7 @@ FIRST_COMMIT=882409b
 LAST_COMMIT=5d173b5
 REPO_PATH=$HOME/src/ego_firmware
 
-./estimate.sh  \
+./sd_multiplier.sh  \
     $REPO_PATH \
     $OPENAIR_HOURS \
     $FIRST_COMMIT \
