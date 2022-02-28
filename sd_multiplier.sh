@@ -12,6 +12,8 @@ REPO_PATH=$1
 OPENAIR_HOURS=$2
 FIRST_COMMIT=$3
 LAST_COMMIT=$4
+IGNORE_DIR=$5
+IGNORE_FILE=$6
 
 cd $REPO_PATH
 
@@ -27,15 +29,15 @@ trap cleanup EXIT
 function count_loc {
     echo "checking out: $1"
     git checkout $1
-    cd $REPO_PATH/code
+    cd $REPO_PATH
     cloc \
         --fullpath \
         --json \
         --by-file \
         --report-file=$MY_DIR/report_$1.json \
-        --not-match-d="(build|data|third-party|html|node_modules|proto-c|wasm_runner\/examples|emsdk|docs\/assets)" \
-        --not-match-f="(package-lock.json)" \
-        components projects
+        --not-match-d=$IGNORE_DIR \
+        --not-match-f=$IGNORE_FILE \
+        code/components code/projects tools
 }
 
 count_loc $FIRST_COMMIT

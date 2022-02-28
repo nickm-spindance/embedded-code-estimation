@@ -8,12 +8,10 @@ function cleanup {
 }
 
 MY_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-REPO_PATH=$1
+REPO_PATH=$HOME/src/esp32-aws-starter
 OPENAIR_HOURS=$2
 FIRST_COMMIT=$3
 LAST_COMMIT=$4
-
-cd $REPO_PATH
 
 # Make sure there are no local changes in the repo
 git diff --quiet --exit-code
@@ -39,22 +37,34 @@ function count_loc {
 }
 
 function gitstats {
-    git log --shortstat $1..$2 | \
+    git log --shortstat | \
     awk '/^ [0-9]/ { f += $1; i += $4; d += $6 } END \
         { printf("%d %d %d\n", f, i, d) }'
 }
 
-count_loc $FIRST_COMMIT
-count_loc $LAST_COMMIT
-stat_output=$(gitstats $FIRST_COMMIT $LAST_COMMIT)
+BRANCH=master
+
+# Multiplier for COCOMO model, computed from prior customer projects
+# (see, for example, ego_sd_multiplier.sh)
+COCOMO_SD_MULTIPLER=0.31693
+
+count_loc $BRANCH
+
+# NOTE (Nick)
+#
+# We can't really use this data right now. It's useful for Brian Tol's model,
+# but that model depends on having total openair hours, which we don't
+# have for the starter kit as a whole. I'll leave this snippet here in
+# case we find a way to use it in the future.
+stat_output=$(gitstats)
 FILES_CHANGED=$(echo $stat_output | cut -d' ' -f1)
 LINES_ADDED=$(echo $stat_output | cut -d' ' -f2)
 LINES_DELETED=$(echo $stat_output | cut -d' ' -f3)
 
-# Feed data into python script
-python $MY_DIR/estimate.py \
-    $MY_DIR/report_$FIRST_COMMIT.json \
-    $MY_DIR/report_$LAST_COMMIT.json \
-    $LINES_ADDED \
-    $LINES_DELETED \
-    $OPENAIR_HOURS
+# Python script will compute the estimated replacement cost for each reusable component.
+# For now, it only uses the COCOMO model. In the future, we might also compute
+# using Brian Tol's model, if we can resolve the "total hours" problem mentioned
+# in the comment above this one.
+python $MY_DIR/component_replacement_cost.py \
+    $MY_DIR/report_$BRANCH.json \
+    $COCOMO_SD_MULTIPLIER
