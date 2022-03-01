@@ -68,3 +68,8 @@ if __name__ == "__main__":
     print("--TOOLS------------------------------------------")
     print("{:<30s} {:5d}   ${:,.2f}".format("Tools", tools_hours, tools_hours * SW_ENG_HOURLY_RATE))
     print("-------------------------------------------------")
+
+    total_hours = sum([hours for hours in components.values()])
+    total_hours += sum([hours for hours in projects.values()])
+    total_hours += tools_hours
+    print("{:<30s} {:5d}   ${:,.2f}".format("Total", total_hours, total_hours * SW_ENG_HOURLY_RATE))
