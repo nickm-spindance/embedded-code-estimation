@@ -1,6 +1,10 @@
 import json
 import sys
 
+def calc_loc(cloc_report):
+    return cloc_report["code"] + cloc_report["comment"]
+    # return cloc_report["code"]
+
 if __name__ == "__main__":
     # Parse input arguments
     with open(sys.argv[1]) as f:
@@ -10,8 +14,8 @@ if __name__ == "__main__":
     openair_hours = int(sys.argv[3])
 
     # Compute total LOC over first..last commit range
-    loc_first = loc_first_json["SUM"]["code"]
-    loc_last = loc_last_json["SUM"]["code"]
+    loc_first = calc_loc(loc_first_json["SUM"])
+    loc_last = calc_loc(loc_last_json["SUM"])
     loc_diff = loc_last - loc_first
 
     # Compute SD COCOMO multiplier from total hours and LOC

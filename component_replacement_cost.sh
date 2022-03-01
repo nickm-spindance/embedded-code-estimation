@@ -42,10 +42,6 @@ function gitstats {
 
 BRANCH=master
 
-# Multiplier for COCOMO model, computed from prior customer projects
-# (see, for example, ego_sd_multiplier.sh)
-COCOMO_SD_MULTIPLIER=0.31693
-
 count_loc $BRANCH
 
 # NOTE (Nick)
@@ -63,6 +59,4 @@ LINES_DELETED=$(echo $stat_output | cut -d' ' -f3)
 # For now, it only uses the COCOMO model. In the future, we might also compute
 # using Brian Tol's model, if we can resolve the "total hours" problem mentioned
 # in the comment above this one.
-python $MY_DIR/component_replacement_cost.py \
-    $MY_DIR/report_$BRANCH.json \
-    $COCOMO_SD_MULTIPLIER
+python $MY_DIR/component_replacement_cost.py $MY_DIR/report_$BRANCH.json \

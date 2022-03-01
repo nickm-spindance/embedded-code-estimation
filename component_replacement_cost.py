@@ -3,6 +3,20 @@ import sys
 import math
 
 SW_ENG_HOURLY_RATE = 185
+INCLUDE_COMMENTS = True
+
+# Average multiplier for COCOMO model, computed from prior customer projects
+# (see, for example, ego_sd_multiplier.sh, grilla_sd_multiplier.sh)
+if INCLUDE_COMMENTS:
+    COCOMO_SD_MULTIPLIER = (.244 + .124) / 2 # code + comments
+else:
+    COCOMO_SD_MULTIPLIER = (.306 + .145) / 2 # code only, no comments
+
+def calc_loc(cloc_report):
+    if INCLUDE_COMMENTS:
+        return cloc_report["code"] + cloc_report["comment"]
+    else:
+        return cloc_report["code"]
 
 # COCOMO: PersonHours = a * KLOC ^ b * HoursPerMonth * SDMultiplier
 def cocomo_estimate(loc, sd_mult):
@@ -18,7 +32,6 @@ if __name__ == "__main__":
     # Parse input arguments
     with open(sys.argv[1]) as f:
         loc_json = json.load(f)
-    cocomo_sd_multiplier = float(sys.argv[2])
 
     # key = component name, val = COCOMO estimate of hours
     components = {}
@@ -35,23 +48,23 @@ if __name__ == "__main__":
 
         if key.startswith("code/components"):
             component_name = key.split('/')[2]
-            loc = val["code"]
-            hours = cocomo_estimate(loc, cocomo_sd_multiplier)
+            loc = calc_loc(val)
+            hours = cocomo_estimate(loc, COCOMO_SD_MULTIPLIER)
             if component_name in components:
                 components[component_name] += hours
             else:
                 components[component_name] = hours
         elif key.startswith("code/projects"):
             project_name = key.split('/')[2]
-            loc = val["code"]
-            hours = cocomo_estimate(loc, cocomo_sd_multiplier)
+            loc = calc_loc(val)
+            hours = cocomo_estimate(loc, COCOMO_SD_MULTIPLIER)
             if project_name in projects:
                 projects[project_name] += hours
             else:
                 projects[project_name] = hours
         elif key.startswith("tools"):
-            loc = val["code"]
-            hours = cocomo_estimate(loc, cocomo_sd_multiplier)
+            loc = calc_loc(val)
+            hours = cocomo_estimate(loc, COCOMO_SD_MULTIPLIER)
             tools_hours += hours
 
     # print(components)
