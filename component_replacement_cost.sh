@@ -9,9 +9,7 @@ function cleanup {
 
 MY_DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 REPO_PATH=$HOME/src/esp32-aws-starter
-OPENAIR_HOURS=$2
-FIRST_COMMIT=$3
-LAST_COMMIT=$4
+cd $REPO_PATH
 
 # Make sure there are no local changes in the repo
 git diff --quiet --exit-code
@@ -25,15 +23,15 @@ trap cleanup EXIT
 function count_loc {
     echo "checking out: $1"
     git checkout $1
-    cd $REPO_PATH/code
+    cd $REPO_PATH
     cloc \
         --fullpath \
         --json \
         --by-file \
         --report-file=$MY_DIR/report_$1.json \
         --not-match-d="(build|data|third-party|html|node_modules|proto-c|wasm_runner\/examples|emsdk|docs\/assets)" \
-        --not-match-f="(package-lock.json)" \
-        components projects
+        --not-match-f="(package-lock.json|espcoredump.py)" \
+        code/components code/projects tools
 }
 
 function gitstats {
@@ -46,7 +44,7 @@ BRANCH=master
 
 # Multiplier for COCOMO model, computed from prior customer projects
 # (see, for example, ego_sd_multiplier.sh)
-COCOMO_SD_MULTIPLER=0.31693
+COCOMO_SD_MULTIPLIER=0.31693
 
 count_loc $BRANCH
 
