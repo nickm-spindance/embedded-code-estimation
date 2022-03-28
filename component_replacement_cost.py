@@ -10,7 +10,6 @@ INCLUDE_COMMENTS = True
 buckets = {
     'core': [
         'common_macros',
-        'common_topics',
         'containers',
         'json_utils',
         'nvs_driver',
@@ -42,6 +41,7 @@ buckets = {
         'event_loop',
         'pubsub',
         'work_queue',
+        'common_topics',
     ],
     'ota': [
         'ota_firmware_update',
